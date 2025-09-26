@@ -1,0 +1,52 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, coverage
+*.test
+coverage.out
+
+# Build output
+bin/
+_build/
+dist/
+
+# Dependency directory (vendored packages)
+vendor/
+
+# Temporary files
+tmp/
+temp/
+*.log
+
+# Environment files (do NOT commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Uploads / user generated content
+/uploads/
+
+# Swagger / generated API docs
+/swagger/
+/docs/swagger/
+
+# Editor folders and files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Misc
+*.cache
+node_modules/
+
+# Note: keep go.sum tracked for reproducible builds
+!go.sum
