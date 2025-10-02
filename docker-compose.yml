@@ -1,0 +1,125 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database Service
+  postgres:
+    image: postgres:13
+    container_name: customable_corporate_site_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: customable_corporate_site_db
+      POSTGRERS_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - customable_corporate_site_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Service (for future use in week 3)
+  redis:
+    image: redis:6
+    container_name: customable_corporate_site_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - customable_corporate_site_network
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Service (for production use)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: customable_corporate_site_api
+    restart: unless-stopped
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+      - DB_NAME=customable_corporate_site_db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=your_jwt_secret_key
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - customable_corporate_site_network
+    volumes:
+      - ./uploads:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    profiles:
+      - production
+
+  # Development API Service (with volume mounting for live reload)
+  api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: customable_corporate_site_api_dev
+    restart: unless-stopped
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=myuser
+      - DB_PASSWORD=mypassword
+      - DB_NAME=customable_corporate_site_db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=your_jwt_secret_key
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - customable_corporate_site_network
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+    command: ["sh", "-c", "air"]  # Assuming 'air' is used for live reload in Go projects
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    profiles:
+      - development
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  customable_corporate_site_network:
+    driver: bridge

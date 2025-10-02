@@ -11,9 +11,9 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func ConnectDB(cfg *config.DatabaseConfig) (*gorm.DB, error) {
+func ConnectDB(cfg *config.Config) (*gorm.DB, error) {
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.User, cfg.Password, cfg.DBName, cfg.SSLMode)
+		cfg.Database.Host, cfg.Database.Port, cfg.Database.User, cfg.Database.Password, cfg.Database.DBName, cfg.Database.SSLMode)
 
 	// GORM configuration
 	gormConfig := &gorm.Config{
@@ -24,14 +24,11 @@ func ConnectDB(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 	}
 
 	// Set logger level based on environment
-	if cfg.SSLMode == "disable" { // Assuming "disable" means development
-		gormConfig.Logger = logger.Default.LogMode(logger.Info)
-	} else { // Production
+	if cfg.Server.Mode == "release" {
 		gormConfig.Logger = logger.Default.LogMode(logger.Error)
 	}
 
 	log.Println("Connecting to database...")
-
 	db, err := gorm.Open(postgres.Open(dsn), gormConfig)
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
