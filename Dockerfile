@@ -21,7 +21,7 @@ COPY . .
 
 # Build the Go application
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
-    -ldflas='-w -s -extldflags "-static"' \
+    -ldflags "-w -s -extldflags '-static'" \
     -a -installsuffix cgo \
     -o main cmd/server/main.go
 

@@ -10,12 +10,13 @@ services:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: customable_corporate_site_db
-      POSTGRERS_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-db.sh:/docker-entrypoint-initdb.d/init-db.sql
+      # If you have SQL initialization files, place them in ./scripts/init-sql/ and they'll be executed by Postgres on first run
+      - ./scripts/init-sql/:/docker-entrypoint-initdb.d/:ro
     networks:
       - customable_corporate_site_network
     healthcheck:
