@@ -118,8 +118,8 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 // @Failure 404 {object} services.ErrorResponse
 // @Router /api/v1/auth/profile [get]
 func (h *AuthHandler) GetProfile(c *gin.Context) {
-	// Get UserID from JWT middleware
-	userID, exists := c.Get("userID")
+	// Get UserID from JWT middleware (middleware sets "user_id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		utils.ErrorResponse(c, http.StatusUnauthorized, "Unauthorized", nil)
 		return
@@ -156,8 +156,8 @@ func (h *AuthHandler) GetProfile(c *gin.Context) {
 // @Failure 404 {object} services.ErrorResponse
 // @Router /api/v1/auth/profile [put]
 func (h *AuthHandler) UpdateProfile(c *gin.Context) {
-	// Get UserID from JWT middleware
-	userID, exists := c.Get("userID")
+	// Get UserID from JWT middleware (middleware sets "user_id")
+	userID, exists := c.Get("user_id")
 	if !exists {
 		utils.ErrorResponse(c, http.StatusUnauthorized, "Unauthorized", nil)
 		return

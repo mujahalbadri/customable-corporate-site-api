@@ -29,8 +29,8 @@ func JWTAuth(secret string) gin.HandlerFunc {
 
 		// Check bearer format
 		tokenParts := strings.Split(authHeader, " ")
-		if len(tokenParts) != 2 || strings.ToLower(tokenParts[0]) != "Bearer" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header format must be Bearer {token}", "message": "Unauthorized"})
+		if len(tokenParts) != 2 || strings.ToLower(tokenParts[0]) != "bearer" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header format must be 'Bearer <token>'", "message": "Unauthorized"})
 			c.Abort()
 			return
 		}
@@ -146,7 +146,7 @@ func OptionalAuth(secret string) gin.HandlerFunc {
 
 		// Check Bearer format
 		tokenParts := strings.Split(authHeader, " ")
-		if len(tokenParts) != 2 || strings.ToLower(tokenParts[0]) != "Bearer" {
+		if len(tokenParts) != 2 || strings.ToLower(tokenParts[0]) != "bearer" {
 			c.Next()
 			return
 		}

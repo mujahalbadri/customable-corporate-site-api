@@ -19,13 +19,15 @@ func Logger() gin.HandlerFunc {
 		}
 
 		// Custom log format
-		return fmt.Sprintf("%s[CORPORATE-API]%s %s - [%s] %s\"%s %s %s %d%s\" %s %s \"%s\" \"%s\"\n",
+		// Simplified and type-correct log format
+		return fmt.Sprintf("%s[CORPORATE-API]%s %s - [%s] %s %s %s %s %s %d %v \"%s\" \"%s\" \"%s\"\n",
 			"\033[90m", resetColor, // Gray for app name
 			param.ClientIP,
 			param.TimeStamp.Format("2006/01/02 - 15:04:05"),
 			methodColor, param.Method, resetColor,
 			param.Path,
-			statusColor, param.StatusCode, resetColor,
+			statusColor,
+			param.StatusCode,
 			param.Latency,
 			param.Request.UserAgent(),
 			param.Request.Header.Get("X-Request-ID"),
